@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-analyze:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      name: Checkout repository
+
+    - name: Setup.NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+
+    - name: Build and run tests
+      run: |
+        dotnet build --configuration Release
+        # Add commands here to run your tests if needed
+
+    - name: Run SonarQube analysis
+      uses: SonarSource/sonarqube-action@master
+      env:
+        GITHUB_TOKEN: ${{ 8A133F821184C3F03516C0B2D08009B5DE28E262 }} # Token to authenticate with GitHub
+        SONAR_TOKEN: ${{ sqa_13aea2a2c7a9cb87ee31a5607ff789b5e4f178b8 }} # Your SonarQube token
+        SONAR_PROJECT_KEY: AzureSonar
+        SONAR_ORGANIZATION: AzureSonar
+        SONAR_HOST_URL: https://fiapsonar.azurewebsites.net # Use your SonarQube server URL if different
+        SONAR_QUALITY_GATE_ENABLED: true
+        SONAR_USER_HOME: $GITHUB_WORKSPACE/.sonar
+
+    - name: Publish Quality Gate Result
+      uses: SonarSource/sonarqube-action@master
+      with:
+        args: -X
